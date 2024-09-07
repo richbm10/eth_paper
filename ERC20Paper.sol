@@ -3,11 +3,11 @@
 pragma solidity ^0.8.26;
 
 contract Paper {
-    mapping (address => uint256) public balance;
-    mapping (address => uint256) public allowedSpenders;
+    mapping (address => uint256) private balance;
+    mapping (address => uint256) private allowedSpenders;
     address public tokenOwner;
     uint256 public limit;
-    uint256 public circulation;
+    uint256 private circulation;
     string public name;
     string public symbol;
 
@@ -75,7 +75,7 @@ contract Paper {
     }
 
     function allowance(address owner, address spender) public view returns (uint256) {
-        require(owner == tokenOwner, "The owner address is not the token owner!");
+        require(owner == tokenOwner, "Allowance is only available for token owner balance!");
         return allowedSpenders[spender];
     }
     
@@ -84,8 +84,9 @@ contract Paper {
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public allowedSpender(amount) enoughBalance(tokenOwner, amount) {
+        require(sender == tokenOwner, "Allowance is only available for token owner balance!");
         balance[recipient] = balance[recipient] + amount;
-        balance[tokenOwner] = balance[tokenOwner] - amount;
+        balance[sender] = balance[sender] - amount;
         emit Transfer(sender, recipient, amount);
     }
 }
