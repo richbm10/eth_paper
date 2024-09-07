@@ -79,8 +79,9 @@ contract Paper {
         return allowedSpenders[spender];
     }
     
-    function approve(address spender, uint256 amount) public onlyOwner enoughBalance(tokenOwner, amount) {
+    function approve(address spender, uint256 amount) public onlyOwner enoughBalance(msg.sender, amount) {
         allowedSpenders[spender] = amount;
+        emit Approval(msg.sender, spender, amount);
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public allowedSpender(amount) enoughBalance(tokenOwner, amount) {
