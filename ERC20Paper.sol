@@ -21,7 +21,7 @@ contract Paper {
     }
 
     modifier allowedSpender(uint256 _amount) {
-        require(allowedSpenders[msg.sender] >= _amount, "Spender is not allowed to spend the amount of token owner tokens!");
+        require(_amount <= allowedSpenders[msg.sender], "Spender is not allowed to spend the amount of token owner tokens!");
 
         _;
     }
@@ -76,7 +76,7 @@ contract Paper {
 
     function allowance(address owner, address spender) public view returns (uint256) {
         require(owner == tokenOwner, "The owner address is not the token owner!");
-        return balance[spender];
+        return allowedSpenders[spender];
     }
     
     function approve(address spender, uint256 amount) public onlyOwner enoughBalance(tokenOwner, amount) {
@@ -85,7 +85,7 @@ contract Paper {
 
     function transferFrom(address sender, address recipient, uint256 amount) public allowedSpender(amount) enoughBalance(tokenOwner, amount) {
         balance[recipient] = balance[recipient] + amount;
-        balance[sender] = balance[sender] - amount;
+        balance[tokenOwner] = balance[tokenOwner] - amount;
         emit Transfer(sender, recipient, amount);
     }
 }
